@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id'])) {
     <title>Client Dashboard</title>
 </head>
 <body>
-    <h1>Welcome, <?= htmlspecialchars($_SESSION['user_name']); ?></h1>
+    <h1>Welcome, <?= htmlspecialchars($_SESSION['username']); ?></h1>
     <nav>
         <a href="submit_ticket.php">Submit a Ticket</a>
         <a href="my_tickets.php">View My Tickets</a>
