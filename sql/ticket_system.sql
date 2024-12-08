@@ -30,3 +30,4 @@ CREATE TABLE faq (
     question TEXT NOT NULL,
     answer TEXT NOT NULL
 );
+ --a
