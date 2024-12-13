@@ -19,8 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             // Armazena informações do usuário na sessão
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name']; // Adicionando o nome do usuário à sessão
             $_SESSION['user_role'] = $user['role'];
-            echo "Login bem-sucedido! <a href='../index.php'>Ir para o painel.</a>";
+
+            // Redireciona para o painel
+            header("Location: ../index.php");
+            exit;
         } else {
             die("Credenciais inválidas.");
         }
