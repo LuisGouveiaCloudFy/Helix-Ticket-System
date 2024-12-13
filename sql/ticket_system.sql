@@ -31,3 +31,15 @@ CREATE TABLE faq (
     question TEXT NOT NULL,
     answer TEXT NOT NULL
 );
+
+CREATE TABLE ticket_respostas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT NOT NULL,
+    resposta TEXT NOT NULL,
+    data_resposta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    autor_id INT NOT NULL,
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id),
+    FOREIGN KEY (autor_id) REFERENCES users(id)
+);
+
+---PW BD Wnm=VFhax(?h

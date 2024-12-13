@@ -32,6 +32,87 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Tickets</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            text-align: center;
+        }
+
+        .ticket-list {
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: #2575fc;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #6a11cb;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -67,6 +148,11 @@ try {
                 </table>
             <?php endif; ?>
         </section>
+
+        <div class="actions">
+            <a href="../views/dashboard.php" class="btn">Back to Dashboard</a>
+            <a href="submit_ticket.php" class="btn">Create New Ticket</a>
+        </div>
     </div>
 </body>
 </html>

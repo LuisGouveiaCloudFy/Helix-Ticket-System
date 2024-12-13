@@ -69,7 +69,7 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, Admin <?= htmlspecialchars($_SESSION['username']); ?></h1>
+        <h1>Welcome, Admin <?= htmlspecialchars($_SESSION['user_name']); ?></h1>
         <nav>
             <a href="user_management.php">Manage Users</a>
             <a href="department_management.php">Manage Departments</a>
