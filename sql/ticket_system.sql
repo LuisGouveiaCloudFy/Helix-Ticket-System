@@ -12,6 +12,7 @@ CREATE TABLE tickets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     client_id INT NOT NULL,
     department_id INT,
+    title VARCHAR(255) NOT NULL,  -- Adicionada a coluna 'title'
     status ENUM('open', 'assigned', 'closed') DEFAULT 'open',
     priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
     description TEXT NOT NULL,
@@ -30,4 +31,3 @@ CREATE TABLE faq (
     question TEXT NOT NULL,
     answer TEXT NOT NULL
 );
- --a
