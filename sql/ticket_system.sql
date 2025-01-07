@@ -31,3 +31,13 @@ CREATE TABLE faq (
     question TEXT NOT NULL,
     answer TEXT NOT NULL
 );
+
+CREATE TABLE resp_tickets (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT(11) NOT NULL,
+    user_id INT(11) NOT NULL,
+    response TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

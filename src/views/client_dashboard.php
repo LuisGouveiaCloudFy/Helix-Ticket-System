@@ -69,7 +69,7 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, <?= htmlspecialchars($_SESSION['username']); ?></h1>
+        <h1>Welcome to Helix Ticket System!</h1>
         <nav>
             <a href="submit_ticket.php">Submit a Ticket</a>
             <a href="my_tickets.php">View My Tickets</a>
