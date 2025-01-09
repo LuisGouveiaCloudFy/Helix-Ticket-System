@@ -113,7 +113,7 @@
 </head>
 <body>
     <div class="form-container">
-        <form action="../php/register.php" method="POST">
+        <form action="../php/register.php" method="POST" novalidate>
             <a href="javascript:history.back()" class="back-link">Voltar</a>
             <h1>Register</h1>
             <div class="form-group">

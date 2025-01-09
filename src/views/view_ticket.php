@@ -1,23 +1,23 @@
 <?php
-require_once '../config/db.php';  // Inclui o arquivo de configuração do banco de dados
+require_once '../config/db.php';  // Includes the database configuration file
 
 session_start();
 
-// Verifica se o usuário está logado
+// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    die("Você precisa estar logado para ver os detalhes do ticket.");
+    die("You need to be logged in to view the ticket details.");
 }
 
-// Verifica se o ID do ticket foi passado
+// Check if the ticket ID is provided
 if (!isset($_GET['id'])) {
-    die("ID do ticket não especificado.");
+    die("Ticket ID not specified.");
 }
 
 $ticket_id = intval($_GET['id']);
 $user_id = $_SESSION['user_id'];
 
 try {
-    // Busca os detalhes do ticket
+    // Fetch ticket details
     $stmt = $pdo->prepare("SELECT t.id, t.title, t.status, t.priority, t.created_at, d.name AS department_name
                             FROM tickets t
                             LEFT JOIN departments d ON t.department_id = d.id
@@ -25,13 +25,36 @@ try {
     $stmt->execute([':ticket_id' => $ticket_id, ':client_id' => $user_id]);
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Verifica se o ticket existe
+    // Check if the ticket exists
     if (!$ticket) {
-        die("Ticket não encontrado ou você não tem permissão para visualizá-lo.");
+        die("Ticket not found or you do not have permission to view it.");
     }
 
-    // Busca as respostas do ticket
-    $stmt = $pdo->prepare("SELECT r.id, r.response, r.created_at, u.username
+    // Process ticket actions
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+        $action = $_POST['action'];
+
+        try {
+            if ($action === 'close') {
+                // Close the ticket
+                $stmt = $pdo->prepare("UPDATE tickets SET status = 'closed' WHERE id = :ticket_id AND client_id = :client_id");
+                $stmt->execute([':ticket_id' => $ticket_id, ':client_id' => $user_id]);
+                header("Location: view_ticket.php?id=" . $ticket_id); // Redirect to the same page
+                exit;
+            } elseif ($action === 'reopen') {
+                // Reopen the ticket
+                $stmt = $pdo->prepare("UPDATE tickets SET status = 'open' WHERE id = :ticket_id AND client_id = :client_id");
+                $stmt->execute([':ticket_id' => $ticket_id, ':client_id' => $user_id]);
+                header("Location: view_ticket.php?id=" . $ticket_id); // Redirect to the same page
+                exit;
+            }
+        } catch (PDOException $e) {
+            die("Error updating ticket status: " . $e->getMessage());
+        }
+    }
+
+    // Fetch responses to the ticket
+    $stmt = $pdo->prepare("SELECT r.id, r.response, r.created_at, u.username, u.role
                             FROM resp_tickets r
                             LEFT JOIN users u ON r.user_id = u.id
                             WHERE r.ticket_id = :ticket_id
@@ -39,29 +62,11 @@ try {
     $stmt->execute([':ticket_id' => $ticket_id]);
     $responses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Erro ao buscar os detalhes do ticket: " . $e->getMessage());
+    die("Error fetching ticket details: " . $e->getMessage());
 }
 
-// Processa a resposta ao ticket
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response = trim($_POST['response']);
-
-    if (empty($response)) {
-        die("A resposta não pode estar vazia.");
-    }
-
-    try {
-        // Insere a resposta na tabela resp_tickets
-        $stmt = $pdo->prepare("INSERT INTO resp_tickets (ticket_id, user_id, response) VALUES (:ticket_id, :user_id, :response)");
-        $stmt->execute([':ticket_id' => $ticket_id, ':user_id' => $user_id, ':response' => $response]);
-
-        // Redireciona para a mesma página para evitar reenvio do formulário
-        header("Location: view_ticket.php?id=" . $ticket_id);
-        exit;
-    } catch (PDOException $e) {
-        die("Erro ao adicionar a resposta: " . $e->getMessage());
-    }
-}
+// Fetch departments for dropdown
+$departments = ['Support', 'Sales', 'HR', 'Agent']; // Add 'Agent' to the list
 ?>
 
 <!DOCTYPE html>
@@ -69,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizar Ticket</title>
+    <title>View Ticket</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
         body {
@@ -89,46 +94,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 10px;
             padding: 2rem;
             width: 90%;
-            max-width: 800px;
+            max-width: 600px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            text-align: left; /* Align text to the left for better readability */
         }
 
         h1 {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin: 0.5rem 0;
         }
 
         .response-form {
             margin-top: 2rem;
         }
 
-        .response {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 1rem;
+        textarea {
+            width: 100%;
+            padding: 10px;
             border-radius: 5px;
-            margin-bottom: 1rem;
-            text-align: left;
+            border: 1px solid #ccc;
+            resize: none; /* Prevent resizing */
+            margin-bottom: 10px;
         }
 
-        .response p {
-            margin: 0.5rem 0;
+        .button {
+            padding: 10px;
+            background: #2575fc;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 10px 0;
+            width: 100%; /* Set button width to 100% */
+        }
+
+        .button:hover {
+            background: #6a11cb;
+        }
+
+        .status {
+            margin: 1rem 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .response {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .agent-response {
+            background: rgba(0, 123, 255, 0.2); /* Light blue for agent responses */
+            text-align: left; /* Align agent responses to the left */
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            margin: 0 5px; /* Space between buttons */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Ticket: <?= htmlspecialchars($ticket['title']); ?></h1>
-        <p><strong>Departamento:</strong> <?= htmlspecialchars($ticket['department_name']); ?></p>
-        <p><strong>Status:</strong> <?= htmlspecialchars($ticket['status']); ?></p>
-        <p><strong>Prioridade:</strong> <?= htmlspecialchars($ticket['priority']); ?></p>
-        <p><strong>Criado Em:</strong> <?= htmlspecialchars($ticket['created_at']); ?></p>
+        <p><strong>Department:</strong> <?= htmlspecialchars($ticket['department_name']); ?></p>
+        <p><strong>Status:</strong> <span class="status"><?= htmlspecialchars($ticket['status']); ?></span></p>
+        <p><strong>Priority:</strong> <?= htmlspecialchars($ticket['priority']); ?></p>
+        <p><strong>Created At:</strong> <?= htmlspecialchars($ticket['created_at']); ?></p>
 
-        <h2>Respostas</h2>
+        <h2>Responses</h2>
         <?php if (empty($responses)): ?>
-            <p>Nenhuma resposta ainda.</p>
+            <p>No responses yet.</p>
         <?php else: ?>
             <?php foreach ($responses as $response): ?>
-                <div class="response">
+                <div class="response <?= $response['role'] === 'agent' ? 'agent-response' : ''; ?>">
                     <p><strong><?= htmlspecialchars($response['username']); ?>:</strong></p>
                     <p><?= htmlspecialchars($response['response']); ?></p>
                     <p><em><?= htmlspecialchars($response['created_at']); ?></em></p>
@@ -137,12 +190,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <div class="response-form">
-            <h3>Adicionar Resposta</h3>
+            <h3>Add Response</h3>
             <form action="" method="POST">
-                <textarea name="response" rows="4" required placeholder="Digite sua resposta aqui..."></textarea>
+                <textarea name="response" rows="4" required placeholder="Type your response here..."></textarea>
                 <br>
-                <button type="submit">Enviar Resposta</button>
+                <button type="submit">Send Response</button>
             </form>
+        </div>
+
+        <div class="action-buttons">
+            <form action="" method="POST" style="flex: 1;">
+                <input type="hidden" name="ticket_id" value="<?= htmlspecialchars($ticket['id']); ?>">
+                <?php if ($ticket['status'] === 'closed'): ?>
+                    <button type="submit" name="action" value="reopen" class="button">Reopen Ticket</button>
+                <?php else: ?>
+                    <button type="submit" name="action" value="close" class="button">Close Ticket</button>
+                <?php endif; ?>
+            </form>
+            <a href="my_tickets.php" class="button">Back to My Tickets</a>
         </div>
     </div>
 </body>

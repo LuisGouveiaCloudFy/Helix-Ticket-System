@@ -69,11 +69,12 @@ if (!isset($_SESSION['user_id'])) {
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, Admin <?= htmlspecialchars($_SESSION['username']); ?></h1>
+    <h1>Welcome, Admin <?= isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : ' '; ?></h1>
         <nav>
             <a href="user_management.php">Manage Users</a>
             <a href="department_management.php">Manage Departments</a>
             <a href="view_statistics.php">View Statistics</a>
+            <a href="edit_profile.php">Edit Profile</a> <!-- Adicionado o botão de Edit Profile -->
             <a href="../php/logout.php">Logout</a>
         </nav>
     </div>
