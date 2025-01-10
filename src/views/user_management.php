@@ -48,8 +48,8 @@ try {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             padding: 2rem;
-            width: 90%;
-            max-width: 800px;
+            width: 95%; /* Aumenta a largura da janela */
+            max-width: 1000px; /* Aumenta a largura máxima da janela */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
@@ -57,6 +57,7 @@ try {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
+            table-layout: auto; /* Permite que as colunas se ajustem ao conteúdo */
         }
 
         th, td {
@@ -64,7 +65,9 @@ try {
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
             vertical-align: middle; /* Alinhamento vertical */
-            min-height: 50px; /* Altura mínima para as células */
+            overflow: hidden; /* Esconde o conteúdo que excede a largura da célula */
+            text-overflow: ellipsis; /* Adiciona reticências para texto longo */
+            white-space: nowrap; /* Impede a quebra de linha */
         }
 
         th {
@@ -77,19 +80,20 @@ try {
 
         .actions {
             display: flex;
-            justify-content: flex-start; /* Alinha os botões à esquerda */
-            gap: 0.5rem;
-            align-items: center; /* Alinha verticalmente os botões */
+            justify-content: space-between;
+            align-items: center;
+            height: 50px; /* Altura consistente */
+            gap: 0.5rem; /* Aumenta o espaço entre os botões */
         }
 
         .btn {
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.6rem; /* Ajusta o padding para caber melhor */
             border: none;
             border-radius: 5px;
             color: white;
             cursor: pointer;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* Ajusta o tamanho da fonte */
             transition: background 0.3s ease;
         }
 
@@ -279,9 +283,9 @@ try {
 
         // Confirmar a exclusão do usuário
         document.getElementById("confirmDelete").onclick = function() {
-            const password = document.getElementById("password").value;
+    const password = document.getElementById("password").value;
 
-            // Verifica se a senha foi inserida
+    // Verifica se a senha foi inserida
             if (!password) {
                 alert("Please enter your password.");
                 return;
@@ -297,6 +301,7 @@ try {
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data); // Verifica a resposta do servidor
                 if (data.success) {
                     // Redireciona para a página de gerenciamento de usuários após a exclusão
                     window.location.reload();

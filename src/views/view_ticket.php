@@ -51,6 +51,18 @@ try {
         } catch (PDOException $e) {
             die("Error updating ticket status: " . $e->getMessage());
         }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['response'])) {
+        // Add new response
+        $response = $_POST['response'];
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO resp_tickets (ticket_id, user_id, response) VALUES (:ticket_id, :user_id, :response)");
+            $stmt->execute([':ticket_id' => $ticket_id, ':user_id' => $user_id, ':response' => $response]);
+            header("Location: view_ticket.php?id=" . $ticket_id); // Redirect to the same page
+            exit;
+        } catch (PDOException $e) {
+            die("Error adding response: " . $e->getMessage());
+        }
     }
 
     // Fetch responses to the ticket
@@ -112,8 +124,8 @@ $departments = ['Support', 'Sales', 'HR', 'Agent']; // Add 'Agent' to the list
             margin-top: 2rem;
         }
 
-        textarea {
-            width: 100%;
+        .response-form textarea {
+            width: calc(100% - 20px); /* Ajusta a largura para compensar o padding */
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
@@ -121,50 +133,72 @@ $departments = ['Support', 'Sales', 'HR', 'Agent']; // Add 'Agent' to the list
             margin-bottom: 10px;
         }
 
+        .response {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 10px; /* Mantém o padding existente */
+            margin: 10px 0;
+            width: 100%; /* Garante que as respostas ocupem 100% da largura do contêiner */
+            box-sizing: border-box; /* Inclui o padding na largura total */
+        }
+
         .button {
             padding: 10px;
-            background: #2575fc;
             border: none;
             border-radius: 5px;
             color: white;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.3s ease;
-            margin: 10px 0;
-            width: 100%; /* Set button width to 100% */
+            transition: background 0.3s ease, transform 0.2s ease; /* Adiciona transição para transformação */
+            text-align: center; /* Alinha o texto ao centro */
+            width: 100%; /* Faz com que todos os botões ocupem toda a largura */
+            margin: 10px 0; /* Espaço igual entre os botões */
         }
 
         .button:hover {
-            background: #6a11cb;
+            transform: scale(1.05); /* Aumenta ligeiramente o tamanho do botão ao passar o mouse */
         }
 
-        .status {
-            margin: 1rem 0;
-            font-weight: bold;
-            font-size: 1.1rem;
+        .button.send-response {
+            background: #2575fc; /* Cor do botão de enviar resposta */
         }
 
-        .response {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
+        .button.send-response:hover {
+            background: #1a5bb8; /* Cor mais escura ao passar o mouse */
         }
 
-        .agent-response {
-            background: rgba(0, 123, 255, 0.2); /* Light blue for agent responses */
-            text-align: left; /* Align agent responses to the left */
+        .button.close {
+            background: red; /* Cor do botão de fechar */
+        }
+
+        .button.close:hover {
+            background: darkred; /* Cor mais escura ao passar o mouse */
+        }
+
+        .button.reopen {
+            background: green; /* Cor do botão de reabrir */
+        }
+
+        .button.reopen:hover {
+            background: darkgreen; /* Cor mais escura ao passar o mouse */
+        }
+
+        .button.back {
+            background: #2575fc; /* Cor azul padrão */
+        }
+
+        .button.back:hover {
+            background: #1a5bb8; /* Cor mais escura ao passar o mouse */
         }
 
         .action-buttons {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column; /* Coloca os botões em colunas */
             margin-top: 20px;
         }
 
-        .action-buttons button {
-            flex: 1;
-            margin: 0 5px; /* Space between buttons */
+        .no-underline {
+            text-decoration: none; /* Remove o sublinhado */
         }
     </style>
 </head>
@@ -192,9 +226,9 @@ $departments = ['Support', 'Sales', 'HR', 'Agent']; // Add 'Agent' to the list
         <div class="response-form">
             <h3>Add Response</h3>
             <form action="" method="POST">
-                <textarea name="response" rows="4" required placeholder="Type your response here..."></textarea>
+                <textarea name="response" rows="4" required placeholder="Type your response here..." class="textarea"></textarea>
                 <br>
-                <button type="submit">Send Response</button>
+                <button type="submit" class="button send-response">Send Response</button>
             </form>
         </div>
 
@@ -202,12 +236,12 @@ $departments = ['Support', 'Sales', 'HR', 'Agent']; // Add 'Agent' to the list
             <form action="" method="POST" style="flex: 1;">
                 <input type="hidden" name="ticket_id" value="<?= htmlspecialchars($ticket['id']); ?>">
                 <?php if ($ticket['status'] === 'closed'): ?>
-                    <button type="submit" name="action" value="reopen" class="button">Reopen Ticket</button>
+                    <button type="submit" name="action" value="reopen" class="button reopen">Reopen Ticket</button>
                 <?php else: ?>
-                    <button type="submit" name="action" value="close" class="button">Close Ticket</button>
+                    <button type="submit" name="action" value="close" class="button close">Close Ticket</button>
                 <?php endif; ?>
             </form>
-            <a href="my_tickets.php" class="button">Back to My Tickets</a>
+            <a href="my_tickets.php" class="button back no-underline">Back to My Tickets</a>
         </div>
     </div>
 </body>

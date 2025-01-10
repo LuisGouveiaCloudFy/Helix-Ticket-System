@@ -73,6 +73,7 @@ if (!isset($_SESSION['user_id'])) {
         <nav>
             <a href="tickets_by_department.php">Tickets in My Department</a>
             <a href="manage_tickets.php">Manage Tickets</a>
+            <a href="agent_user_management.php">User Management</a>
             <a href="../php/logout.php">Logout</a>
         </nav>
     </div>

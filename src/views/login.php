@@ -82,10 +82,50 @@
             background: #6a11cb;
         }
 
-        @media (max-width: 480px) {
-            form {
-                padding: 1.5rem;
-            }
+        /* Estilo do modal */
+        .modal {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Ajuste da cor do texto da mensagem de erro */
+        #errorMessage {
+            color: #d8000c; /* Cor vermelha para a mensagem de erro */
+            text-align: center; /* Centraliza a mensagem */
+            font-weight: bold; /* Coloca a mensagem em negrito */
         }
 
         .register-link {
@@ -109,21 +149,49 @@
 </head>
 <body>
     <div class="form-container">
-    <form action="../php/login.php" method="POST">
-    <h1>Login</h1>
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required placeholder="Enter your email">
+        <form action="../php/login.php" method="POST">
+            <h1>Login</h1>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" required placeholder="Enter your password">
+            </div>
+            <div class="buttons" style="display: flex; justify-content: space-between;">
+                <button type="submit" style="margin-right: 10px;">Login</button>
+                <a href="register.php" class="register-link">Register</a>
+            </div>
+        </form>
     </div>
-    <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required placeholder="Enter your password"> <!-- Verifique se o name está correto -->
+
+    <!-- Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="errorMessage"></p>
+        </div>
     </div>
-    <div class="buttons">
-        <button type="submit">Login</button>
-        <a href="register.php" class="register-link">Register</a>
-    </div>
-</form>
-    </div>
+
+    <script>
+        // Função para abrir o modal
+        function openModal(message) {
+            document.getElementById('errorMessage').innerText = message;
+            document.getElementById('errorModal').style.display = "block";
+        }
+
+        // Função para fechar o modal
+        function closeModal() {
+            document.getElementById('errorModal').style.display = "none";
+        }
+
+        // Verifica se há uma mensagem de erro na URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get('error');
+        if (errorMessage) {
+            openModal(decodeURIComponent(errorMessage));
+        }
+    </script>
 </body>
 </html>

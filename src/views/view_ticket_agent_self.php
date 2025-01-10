@@ -319,7 +319,7 @@ try {
                     <input type="hidden" name="ticket_id" value="<?= htmlspecialchars($ticket['id']); ?>">
                     <button type="submit" name="action" value="auto_assign" class="button send-response">Auto Assign</button>
                 </form>
-                <form action="tickets_by_department.php" method="GET" style="flex: 1;">
+                <form action="manage_tickets.php" method="GET" style="flex: 1;">
                     <button type="submit" class="button send-response">Return</button> <!-- Novo botão "Return" -->
                 </form>
             </div>

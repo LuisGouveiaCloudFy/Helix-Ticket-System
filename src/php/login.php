@@ -11,7 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Verifica se os campos estão vazios
     if (empty($email) || empty($password)) {
-        die("Todos os campos são obrigatórios!"); // Mensagem de erro se campos estiverem vazios
+        $_SESSION['error_message'] = "All fields are required!";
+        header("Location: ../views/login.php?error=" . urlencode($_SESSION['error_message']));
+        exit;
     }
 
     try {
@@ -33,13 +35,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("Location: ../index.php");
                 exit;
             } else {
-                die("Credenciais inválidas."); // Mensagem de erro se a senha estiver incorreta
+                $_SESSION['error_message'] = "The login credentials are incorrect."; // Mensagem de erro
+                header("Location: ../views/login.php?error=" . urlencode($_SESSION['error_message'])); // Redireciona para a página de login
+                exit;
             }
         } else {
-            die("Credenciais inválidas."); // Mensagem de erro se o usuário não existir
+            $_SESSION['error_message'] = "The login credentials are incorrect."; // Mensagem de erro
+            header("Location: ../views/login.php?error=" . urlencode($_SESSION['error_message'])); // Redireciona para a página de login
+            exit;
         }
     } catch (PDOException $e) {
-        die("Erro no banco de dados: " . $e->getMessage()); // Mensagem de erro em caso de falha na consulta
+        die("Database error: " . $e->getMessage()); // Mensagem de erro em caso de falha na consulta
     }
 }
 ?>
